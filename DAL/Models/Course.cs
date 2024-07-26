@@ -8,14 +8,17 @@ namespace Domain.Classes
 {
     public class Course
     {
-        public int CourseID { get; set; }
+        public int CourseId { get; set; }
         public string CourseName { get; set; }
         public string Description { get; set; }
         public string Level { get; set; }
 
-        public Course(int courseID, string courseName, string description, string level)
+        public Course()
         {
-            CourseID = courseID;
+            
+        }
+        public Course(string courseName, string description, string level)
+        {
             CourseName = courseName;
             Description = description;
             Level = level;

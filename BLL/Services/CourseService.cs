@@ -43,14 +43,14 @@ namespace BLL.Services
             _courseAction.DeleteCourse(id);
         }
 
-        public List<Course> SearchCourses(string attribute, string value)
+        public List<Course> SearchCourses(string value)
         {
-            var courses = _courseAction.GetAllCourses();
+            List<Course> courses = _courseAction.GetAllCourses();
             return courses.Where(c =>
-                (attribute.ToLower() == "id" && c.CourseID.ToString().Contains(value)) ||
-                (attribute.ToLower() == "name" && c.CourseName.ToLower().Contains(value)) ||
-                (attribute.ToLower() == "description" && c.Description.ToLower().Contains(value)) ||
-                (attribute.ToLower() == "level" && c.Level.ToLower().Contains(value))
+                (c.CourseId.ToString().Contains(value)) ||
+                (c.CourseName.ToLower().Contains(value)) ||
+                (c.Description.ToLower().Contains(value)) ||
+                (c.Level.ToLower().Contains(value))
             ).ToList();
         }
     }

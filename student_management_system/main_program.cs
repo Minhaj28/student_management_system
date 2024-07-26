@@ -515,8 +515,6 @@ class main_program
 
         static Course CreateCourseUI()
         {
-            Console.WriteLine("Enter Course ID:");
-            int courseID = int.Parse(Console.ReadLine());
             Console.WriteLine("Enter Course Name:");
             string courseName = Console.ReadLine();
             Console.WriteLine("Enter Description:");
@@ -524,10 +522,21 @@ class main_program
             Console.WriteLine("Enter Level (Graduate, Postgraduate, PhD):");
             string level = Console.ReadLine();
 
-            Course course = new Course(courseID, courseName, description, level);
+           
 
-            Console.WriteLine("Course created successfully.");
-            return course;
+            try
+            {
+                Course course = new Course(courseName, description, level);
+
+                Console.WriteLine("Course created successfully.");
+
+                return course;
+            }
+            catch (Exception Ex)
+            {
+
+                throw Ex;
+            }
         }
 
         static void ShowAllCourses(List<Course> courses)
@@ -540,18 +549,16 @@ class main_program
 
             foreach (var course in courses)
             {
-                Console.WriteLine($"ID: {course.CourseID}, Name: {course.CourseName}, Description: {course.Description}, Level: {course.Level}");
+                Console.WriteLine($"ID: {course.CourseId}, Name: {course.CourseName}, Description: {course.Description}, Level: {course.Level}");
             }
         }
 
         List<Course> SelectCourse()
         {
-            Console.WriteLine("Enter attribute to search by (ID, Name, Description, Level):");
-            string attribute = Console.ReadLine();
             Console.WriteLine("Enter value to search for:");
             string value = Console.ReadLine().ToLower();
 
-            List<Course> result = courseService.SearchCourses(attribute, value);
+            List<Course> result = courseService.SearchCourses(value);
 
             return result;
         }
@@ -564,7 +571,7 @@ class main_program
             {
                 foreach (Course course in result)
                 {
-                    Console.WriteLine($"ID: {course.CourseID}, Name: {course.CourseName}, Description: {course.Description}, Level: {course.Level}");
+                    Console.WriteLine($"ID: {course.CourseId}, Name: {course.CourseName}, Description: {course.Description}, Level: {course.Level}");
 
                 }
             }
@@ -588,21 +595,22 @@ class main_program
 
             foreach (Course course in result)
             {
-                Console.WriteLine($"ID: {course.CourseID}, Name: {course.CourseName}, Description: {course.Description}, Level: {course.Level}");
+                Console.WriteLine($"ID: {course.CourseId}, Name: {course.CourseName}, Description: {course.Description}, Level: {course.Level}");
             }
 
             Console.Write("Enter course ID to delete: ");
             int id = int.Parse(Console.ReadLine());
 
-            Course selectedCourse = courseService.GetCourseById(id);
-            if (selectedCourse == null)
+            try
             {
-                Console.WriteLine("Course not found.");
-                return;
-            }
+                courseService.DeleteCourse(id);
+                Console.WriteLine("Course deleted successfully.");
 
-            courseService.DeleteCourse(selectedCourse.CourseID);
-            Console.WriteLine("Course deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         void UpdateCourse()
@@ -621,7 +629,7 @@ class main_program
 
             foreach (Course course in result)
             {
-                Console.WriteLine($"ID: {course.CourseID}, Name: {course.CourseName}, Description: {course.Description}, Level: {course.Level}");
+                Console.WriteLine($"ID: {course.CourseId}, Name: {course.CourseName}, Description: {course.Description}, Level: {course.Level}");
             }
 
             Console.Write("Enter course ID to update: ");
