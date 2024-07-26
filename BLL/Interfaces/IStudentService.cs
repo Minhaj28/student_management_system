@@ -19,7 +19,7 @@ namespace BLL.Interfaces
         public List<Student> GetAllStudents();
         public Student GetStudentById(int id);
         public void CreateStudent(Student student);
-        public void UpdateStudent(Student student);
+        public void UpdateStudent(int id, Student student);
         public void DeleteStudent(int id);
     }
 }

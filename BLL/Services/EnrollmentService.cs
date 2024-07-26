@@ -11,13 +11,13 @@ namespace BLL.Services
     {
         public void EnrollStudent(Student student, Course course)
         {
-            Console.WriteLine($"{student.Name} enrolled in {course.CourseName}");
+            //Console.WriteLine($"{student.Name} enrolled in {course.CourseName}");
             
         }
 
         public void CancelEnrollment(Student student, Course course)
         {
-            Console.WriteLine($"{student.Name} enrollment in {course.CourseName} cancelled");
+            //Console.WriteLine($"{student.Name} enrollment in {course.CourseName} cancelled");
         }
     }
 }

@@ -53,9 +53,9 @@ namespace BLL.Services
             _studentAction.AddStudent(student);
         }
 
-        public void UpdateStudent(Student student)
+        public void UpdateStudent(int id, Student student)
         {
-            _studentAction.UpdateStudent(student);
+            _studentAction.UpdateStudent(id, student);
         }
 
         public void DeleteStudent(int id)
@@ -63,14 +63,17 @@ namespace BLL.Services
             _studentAction.DeleteStudent(id);
         }
 
-        public List<Student> SearchStudents(string attribute, string value)
+        public List<Student> SearchStudents(string value)
         {
             List<Student> students = _studentAction.GetAllStudents();
             return students.Where(s =>
-                (attribute.ToLower() == "id" && s.StudentID.ToString().Contains(value)) ||
-                (attribute.ToLower() == "name" && s.Name.ToLower().Contains(value)) ||
-                (attribute.ToLower() == "email" && s.Email.ToLower().Contains(value)) ||
-                (attribute.ToLower() == "level" && s.Level.ToLower().Contains(value))
+                (s.StudentID.ToString().ToLower().Contains(value)) ||
+                (s.Name.ToString().ToLower().Contains(value)) ||
+                (s.Address.ToString().ToLower().Contains(value)) ||
+                (s.Email.ToString().ToLower().Contains(value)) ||
+                (s.PhoneNumber.ToString().ToLower().Contains(value)) ||
+                (s.Level.ToLower().ToLower().Contains(value)) ||
+                (s.GPA.ToString().ToLower().Contains(value)) 
             ).ToList();
         }
 

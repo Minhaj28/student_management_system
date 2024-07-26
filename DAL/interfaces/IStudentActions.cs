@@ -16,7 +16,7 @@ namespace Domain.interfaces
         public List<Student> GetAllStudents();
         public Student GetStudentById(int id);
         public void AddStudent(Student student);
-        public void UpdateStudent(Student student);
+        public void UpdateStudent(int id, Student student);
         public void DeleteStudent(int id);
     }
 }

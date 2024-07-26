@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.Common;
+using System.Data.Odbc;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using BLL.Interfaces;
@@ -20,6 +23,7 @@ class main_program
 
     static void Main(string[] args)
     {
+
 
         UserAction userAction = new UserAction();
         UserService userService = new UserService(userAction);
@@ -43,19 +47,33 @@ class main_program
         CourseService courseService = new CourseService(courseAction);
 
 
+        /*string conn = "DRIVER={MySQL ODBC 9.0 Unicode Driver}; SERVER=localhost; DATABASE=student_management_system; UID=root;PASSWORD=root; OPTION=3; port=3306; stmt=SET NAMES 'utf8';";
+        OdbcConnection smsConnection = new OdbcConnection(conn);*/
+        // smsConnection.Open();
 
+
+        // Open the connection and execute the insert command.
+
+         
+
+       
+
+        
+
+       
 
         while (true)
         {
+            
             Console.WriteLine("Choose an option:");
-            Console.WriteLine("1. Search student by attribute");
+            Console.WriteLine("1. Search student");
             Console.WriteLine("2. Create student");
             Console.WriteLine("3. Update student");
             Console.WriteLine("4. Delete student");
             Console.WriteLine("5. Create teacher");
             Console.WriteLine("6. Update teacher");
             Console.WriteLine("7. Delete teacher");
-            Console.WriteLine("8. Search teacher by attribute");
+            Console.WriteLine("8. Search teacher");
             Console.WriteLine("9. Show All Student");
             Console.WriteLine("10. Show All Teacher");
             Console.WriteLine("11. Create course");
@@ -66,8 +84,8 @@ class main_program
             Console.WriteLine("16. Show All User");
             Console.WriteLine("17. Create User");
             Console.WriteLine("18. Delete User");
-            Console.WriteLine("19. Search User by attribute");
-            Console.WriteLine("20. Search course by attribute");
+            Console.WriteLine("19. Search User");
+            Console.WriteLine("20. Search course");
             Console.WriteLine("21. Exit");
             string choice = Console.ReadLine();
 
@@ -81,7 +99,7 @@ class main_program
                     studentService.CreateStudent(student);
                     break;
                 case "3":
-                    UpdateStudent();
+                    UpdateStudent(studentService);
                     break;
                 case "4":
                     DeleteStudent();
@@ -309,22 +327,29 @@ class main_program
         static Student CreateStudentUI()
         {
             Console.WriteLine("Enter student details:");
-            Console.Write("ID: ");
-            int id = int.Parse(Console.ReadLine());
             Console.Write("Name: ");
             string name = Console.ReadLine();
+            Console.Write("Address: ");
+            string address = Console.ReadLine();
             Console.Write("Email: ");
             string email = Console.ReadLine();
+            Console.Write("PhoneNumber: ");
+            string phoneNumber = Console.ReadLine();
             Console.Write("Level (Graduate, Postgraduate, PhD): ");
             string level = Console.ReadLine();
+            Console.Write("Gpa: ");
+            string gpa = Console.ReadLine();
 
-            Student student = level.ToLower() switch
+
+            /*Student student = level.ToLower() switch
             {
-                "graduate" => new GraduateStudent(id, name, "", email, "", id, "Graduate", ""),
-                "postgraduate" => new PostgraduateStudent(id, name, "", email, "", id, "Postgraduate", ""),
-                "phd" => new PhDStudent(id, name, "", email, "", id, "PhD", ""),
-                _ => throw new ArgumentException("Invalid level")
-            };
+                //"graduate" => new GraduateStudent(id, name, "", email, "", id, "Graduate", ""),
+                *//*"postgraduate" => new PostgraduateStudent(id, name, "", email, "", id, "Postgraduate", ""),
+                "phd" => new PhDStudent(id, name, "", email, "", id, "PhD", ""),*//*
+               // _ => throw new ArgumentException("Invalid level")
+            };*/
+
+            Student student = new Student(name, address, email, phoneNumber, level, gpa);
 
             Console.WriteLine("Student created successfully.");
             return student;
@@ -335,7 +360,7 @@ class main_program
             {
                 foreach (Student student in students)
                 {
-                    Console.WriteLine($"StudentID: {student.StudentID}, Student: {student.Name}, Email: {student.Email}, Level: {student.Level}, GPA: {student.Gpa}");
+                    Console.WriteLine($"StudentID: {student.StudentID}, Name: {student.Name}, Address: {student.Address}, Email: {student.Email}, PhoneNumber: {student.PhoneNumber}, Level: {student.Level}, GPA: {student.GPA}");
                 }
             }
             else
@@ -348,12 +373,12 @@ class main_program
 
         List<Student> SelectStudent()
         {
-            Console.WriteLine("Enter attribute to search by (ID, Name, Email, Level):");
-            string attribute = Console.ReadLine();
-            Console.WriteLine("Enter value to search for:");
+            /*Console.WriteLine("Enter attribute to search by (ID, Name, Email, Level):");
+            string attribute = Console.ReadLine();*/
+            Console.WriteLine("Enter value to search student:");
             string value = Console.ReadLine().ToLower();
 
-            List<Student> result = studentService.SearchStudents(attribute, value);
+            List<Student> result = studentService.SearchStudents(value);
 
             return result;
 
@@ -366,7 +391,8 @@ class main_program
             {
                 foreach (Student student in result)
                 {
-                    Console.WriteLine($"ID: {student.StudentID}, Name: {student.Name}, Email: {student.Email}, Level: {student.Level}");
+                    Console.WriteLine($"StudentID: {student.StudentID}, Name: {student.Name}, Address: {student.Address}, Email: {student.Email}, PhoneNumber: {student.PhoneNumber}, Level: {student.Level}, GPA: {student.GPA}");
+
                 }
             }
             else
@@ -375,43 +401,70 @@ class main_program
             }
         }
 
-        void UpdateStudent()
+        void UpdateStudent(StudentService studentService)
         {
             List<Student> result = SelectStudent();
 
-            if (result.Count > 0)
-            {
-                Console.WriteLine("Please select the student to update by entering the student ID:");
-                for (int i = 0; i < result.Count; i++)
-                {
-                    Console.WriteLine($"{i + 1}. ID: {result[i].StudentID}, Name: {result[i].Name}, Email: {result[i].Email}, Level: {result[i].Level}");
-                }
-                Console.Write("Enter student ID to update: ");
-                int id = int.Parse(Console.ReadLine());
-
-
-                Student student = studentService.GetStudentById(id);
-                if (student == null)
-                {
-                    Console.WriteLine("Student not found.");
-                    return;
-                }
-
-                Console.Write("Enter new name (leave blank to keep current): ");
-                string name = Console.ReadLine();
-                if (!string.IsNullOrEmpty(name)) student.Name = name;
-
-                Console.Write("Enter new email (leave blank to keep current): ");
-                string email = Console.ReadLine();
-                if (!string.IsNullOrEmpty(email)) student.Email = email;
-
-                Console.WriteLine("Student updated successfully.");
-                studentService.UpdateStudent(student);
-            }
-            else
+            if (result.Count == 0)
             {
                 Console.WriteLine("No students found.");
+                return;
             }
+
+
+
+            Console.WriteLine("Please select the student to update by entering the student ID:");
+
+
+            foreach (Student student1 in result)
+            {
+                Console.WriteLine($"StudentID: {student1.StudentID}, Name: {student1.Name}, Address: {student1.Address}, Email: {student1.Email}, PhoneNumber: {student1.PhoneNumber}, Level: {student1.Level}, GPA: {student1.GPA}");
+
+            }
+            Console.WriteLine();
+
+            Console.Write("Enter student ID to update: ");
+            int id = int.Parse(Console.ReadLine());
+
+            Student currentStudent = studentService.GetStudentById(id);
+
+            // Get user input and keep current values if input is empty
+            Console.Write($"Enter Name ({currentStudent.Name}): ");
+            string input = Console.ReadLine();
+            currentStudent.Name = string.IsNullOrEmpty(input) ? currentStudent.Name : input;
+
+            Console.Write($"Enter Address ({currentStudent.Address}): ");
+            input = Console.ReadLine();
+            currentStudent.Address = string.IsNullOrEmpty(input) ? currentStudent.Address : input;
+
+            Console.Write($"Enter Email ({currentStudent.Email}): ");
+            input = Console.ReadLine();
+            currentStudent.Email = string.IsNullOrEmpty(input) ? currentStudent.Email : input;
+
+            Console.Write($"Enter Phone Number ({currentStudent.PhoneNumber}): ");
+            input = Console.ReadLine();
+            currentStudent.PhoneNumber = string.IsNullOrEmpty(input) ? currentStudent.PhoneNumber : input;
+
+            Console.Write($"Enter Level ({currentStudent.Level}): ");
+            input = Console.ReadLine();
+            currentStudent.Level = string.IsNullOrEmpty(input) ? currentStudent.Level : input;
+
+            // Handling GPA input
+            Console.Write($"Enter GPA ({currentStudent.GPA}): ");
+            currentStudent.GPA = string.IsNullOrEmpty(input) ? currentStudent.GPA : input;
+
+            input = Console.ReadLine();
+            try
+            {
+                studentService.UpdateStudent(id, currentStudent);
+                Console.WriteLine($"Student with ID {id} has been updated.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            
         }
 
         void DeleteStudent()
@@ -426,25 +479,35 @@ class main_program
 
 
 
-            Console.WriteLine(" Please select the student to delete by entering the student ID:");
+            Console.WriteLine("Please select the student to delete by entering the student ID:");
 
-            for (int i = 0; i < result.Count; i++)
+            foreach (Student student in result)
             {
-                Console.WriteLine($"{i + 1}. ID: {result[i].StudentID}, Name: {result[i].Name}, Email: {result[i].Email}, Level: {result[i].Level}");
-            }
+                Console.WriteLine($"StudentID: {student.StudentID}, Name: {student.Name}, Address: {student.Address}, Email: {student.Email}, PhoneNumber: {student.PhoneNumber}, Level: {student.Level}, GPA: {student.GPA}");
 
-            Console.Write("Enter student ID to delete: ");
+            }
+            Console.WriteLine();
+
+           Console.Write("Enter student ID to delete: ");
             int id = int.Parse(Console.ReadLine());
 
-            Student selectedStudent = studentService.GetStudentById(id);
+           /* Student selectedStudent = studentService.GetStudentById(id);
             if (selectedStudent == null)
             {
                 Console.WriteLine("Student not found.");
                 return;
+            }*/
+
+            try
+            {
+                studentService.DeleteStudent(id);
+                Console.WriteLine("Student deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
 
-            studentService.DeleteStudent(selectedStudent.StudentID);
-            Console.WriteLine("Student deleted successfully.");
         }
 
 

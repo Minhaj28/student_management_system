@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace Domain.Classes
 {
-    public class GraduateStudent : Student
+    public class GraduateStudent 
     {
-        public GraduateStudent(int userId, string name, string address, string email, string phoneNumber, int studentID, string level, string gpa)
-            : base(userId, name, address, email, phoneNumber, studentID, "Graduate", gpa) { }
+       
     }
 
 }
