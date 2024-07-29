@@ -17,7 +17,7 @@ namespace Domain.interfaces
         public List<Teacher> GetAllTeachers();
         public Teacher GetTeacherById(int id);
         public void AddTeacher(Teacher teacher);
-        public void UpdateTeacher(Teacher teacher);
+        public void UpdateTeacher(int id, Teacher teacher);
 
         public void DeleteTeacher(int id);
     }

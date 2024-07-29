@@ -58,9 +58,9 @@ namespace BLL.Services
             _teacherAction.AddTeacher(teacher);
         }
 
-        public void UpdateTeacher(Teacher teacher)
+        public void UpdateTeacher(int id, Teacher teacher)
         {
-            _teacherAction.UpdateTeacher(teacher);
+            _teacherAction.UpdateTeacher(id, teacher);
         }
 
         public void DeleteTeacher(int id)
@@ -68,13 +68,17 @@ namespace BLL.Services
             _teacherAction.DeleteTeacher(id);
         }
 
-        public List<Teacher> SearchTeachers(string attribute, string value)
+        public List<Teacher> SearchTeachers(string value)
         {
             List<Teacher> teachers = _teacherAction.GetAllTeachers();
             return teachers.Where(t =>
-                (attribute.ToLower() == "id" && t.TeacherID.ToString().Contains(value)) ||
-                (attribute.ToLower() == "name" && t.Name.ToLower().Contains(value)) ||
-                (attribute.ToLower() == "email" && t.Email.ToLower().Contains(value))
+                (t.TeacherId.ToString().Contains(value)) ||
+                (t.Name.ToLower().Contains(value)) ||
+                (t.Address.ToString().ToLower().Contains(value)) ||
+                (t.Email.ToString().ToLower().Contains(value)) ||
+                (t.PhoneNumber.ToString().ToLower().Contains(value)) ||
+                (t.Department.ToString().ToLower().Contains(value)) ||
+                (t.Designation.ToString().ToLower().Contains(value))
             ).ToList();
         }
     }

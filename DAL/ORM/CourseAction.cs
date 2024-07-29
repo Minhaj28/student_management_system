@@ -49,7 +49,23 @@ namespace DAL.ORM
 
         public Course GetCourseById(int id)
         {
-            return courses.FirstOrDefault(c => c.CourseId == id);
+            try
+            {
+                string _cmdSelect = "select * from course WHERE CourseId = ?";
+
+                OdbcCommand cmd = new OdbcCommand(_cmdSelect);
+
+                cmd.Parameters.AddWithValue("@CourseId", id);
+
+                List<Course> courseList = GetAsList(DBConnection.ExecuteQuery(cmd).Tables[0]);
+
+                return courseList[0];
+            }
+            catch (Exception Ex)
+            {
+
+                throw Ex;
+            }
         }
 
         public void AddCourse(Course course)
@@ -67,14 +83,34 @@ namespace DAL.ORM
             //courses.Add(course);
         }
 
-        public void UpdateCourse(Course course)
+        public void UpdateCourse(int id, Course course)
         {
-            Course existingCourse = GetCourseById(course.CourseId);
-            if (existingCourse != null)
+            try
             {
-                existingCourse.CourseName = course.CourseName;
-                existingCourse.Description = course.Description;
-                existingCourse.Level = course.Level;
+                string _cmdUpdate = "UPDATE Course SET CourseName = ?, Description = ?, Level = ? WHERE CourseId = ?";
+
+                // Create an OdbcCommand object
+                OdbcCommand cmd1 = new OdbcCommand(_cmdUpdate);
+
+                // Add parameters for the fields to be updated
+                cmd1.Parameters.AddWithValue("@CourseName", course.CourseName);
+                cmd1.Parameters.AddWithValue("@Description", course.Description);
+                cmd1.Parameters.AddWithValue("@Level", course.Level);
+               
+
+                // Add the parameter for the ID
+                cmd1.Parameters.AddWithValue("@CourseId", id);
+
+                // Execute the update command
+                DBConnection.ExecuteNonQueryAndScalar(cmd1);
+
+
+
+            }
+            catch (Exception Ex)
+            {
+
+                throw Ex;
             }
         }
 

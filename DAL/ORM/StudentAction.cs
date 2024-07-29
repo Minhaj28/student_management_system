@@ -11,7 +11,7 @@ using System.Data;
 
 namespace DAL.ORM
 {
-    public class StudentAction : UserAction, IStudentActions
+    public class StudentAction : IStudentActions
     {
         protected List<Student> students = new List<Student>();
         public void EnrollInCourse(Student student, Course course)
@@ -125,15 +125,7 @@ namespace DAL.ORM
 
         public void UpdateStudent(int id, Student student)
         {
-            /*var existingStudent = GetStudentById(student.StudentID);
-            if (existingStudent != null)
-            {
-                *//*existingStudent.Name = student.Name;
-                existingStudent.Email = student.Email;*//*
-                existingStudent.Level = student.Level;
-                existingStudent.Gpa = student.Gpa;
-      
-            }*/
+            
 
             try
             {

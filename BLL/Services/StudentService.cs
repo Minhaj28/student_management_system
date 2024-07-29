@@ -72,7 +72,7 @@ namespace BLL.Services
                 (s.Address.ToString().ToLower().Contains(value)) ||
                 (s.Email.ToString().ToLower().Contains(value)) ||
                 (s.PhoneNumber.ToString().ToLower().Contains(value)) ||
-                (s.Level.ToLower().ToLower().Contains(value)) ||
+                (s.Level.ToString().ToLower().Contains(value)) ||
                 (s.GPA.ToString().ToLower().Contains(value)) 
             ).ToList();
         }

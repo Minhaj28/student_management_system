@@ -18,14 +18,6 @@ namespace Domain.Classes
         public string Level { get; set; }
         public string GPA { get; set; }
 
-
-        /* public Student(int userId, string name, string address, string email, string phoneNumber, int studentID, string level, string gpa)
-             : base(userId, name, address, email, phoneNumber)
-         {
-             StudentID = studentID;
-             Level = level;
-             Gpa = gpa;
-         }*/
         public Student () { }
        public Student(string name, string address, string email, string phoneNumber, string level, string gpa) {
             Name = name;

@@ -33,9 +33,9 @@ namespace BLL.Services
             _courseAction.AddCourse(course);
         }
 
-        public void UpdateCourse(Course course)
+        public void UpdateCourse(int id, Course course)
         {
-            _courseAction.UpdateCourse(course);
+            _courseAction.UpdateCourse(id, course);
         }
 
         public void DeleteCourse(int id)

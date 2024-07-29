@@ -34,9 +34,9 @@ namespace BLL.Services
             _userAction.AddUser(user);
         }
 
-        public void UpdateUser(User user)
+        public void UpdateUser(int id, User user)
         {
-            _userAction.UpdateUser(user);
+            _userAction.UpdateUser(id, user);
         }
 
         public void DeleteUser(int id)
@@ -44,15 +44,13 @@ namespace BLL.Services
            _userAction.DeleteUser(id);
         }
 
-        public List<User> SearchUser(string attribute, string value)
+        public List<User> SearchUser(string value)
         {
             List<User> users = _userAction.GetAllUsers();
             return users.Where(u =>
-                (attribute.ToLower() == "id" && u.UserId.ToString().Contains(value)) ||
-                (attribute.ToLower() == "name" && u.Name.ToLower().Contains(value)) ||
-                (attribute.ToLower() == "address" && u.Address.ToLower().Contains(value)) ||
-                (attribute.ToLower() == "email" && u.Email.ToLower().Contains(value)) ||
-                (attribute.ToLower() == "phonenumber" && u.PhoneNumber.ToLower().Contains(value))
+                (u.UserId.ToString().Contains(value)) ||
+                (u.UserName.ToLower().Contains(value)) ||
+                (u.UserPassword.ToLower().Contains(value)) 
             ).ToList();
         }
 

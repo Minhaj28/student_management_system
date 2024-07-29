@@ -6,17 +6,17 @@ using System.Threading.Tasks;
 
 namespace Domain.Classes
 {
-    class Enrollment
+    public class StudentEnrollment
     {
-        public int EnrollmentID { get; set; }
+        public int StudentEnrollmentId { get; set; }
         public int StudentID { get; set; }
-        public int CourseID { get; set; }
+        public int CourseId { get; set; }
 
-        public Enrollment(int enrollmentID, int studentID, int courseID)
+        public StudentEnrollment() { }
+        public StudentEnrollment(int studentID, int courseId)
         {
-            EnrollmentID = enrollmentID;
             StudentID = studentID;
-            CourseID = courseID;
+            CourseId = courseId;
         }
 
        

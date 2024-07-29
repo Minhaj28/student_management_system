@@ -46,6 +46,9 @@ class main_program
         CourseAction courseAction = new CourseAction();
         CourseService courseService = new CourseService(courseAction);
 
+        StudentEnrollmentAction studentEnrollmentAction = new StudentEnrollmentAction();
+        StudentEnrollmentService studentEnrollmentService = new StudentEnrollmentService(studentEnrollmentAction);
+
 
         /*string conn = "DRIVER={MySQL ODBC 9.0 Unicode Driver}; SERVER=localhost; DATABASE=student_management_system; UID=root;PASSWORD=root; OPTION=3; port=3306; stmt=SET NAMES 'utf8';";
         OdbcConnection smsConnection = new OdbcConnection(conn);*/
@@ -82,11 +85,16 @@ class main_program
             Console.WriteLine("14. Delete Course");
             Console.WriteLine("15. Create User");
             Console.WriteLine("16. Show All User");
-            Console.WriteLine("17. Create User");
+            Console.WriteLine("17. Update User");
             Console.WriteLine("18. Delete User");
             Console.WriteLine("19. Search User");
             Console.WriteLine("20. Search course");
             Console.WriteLine("21. Exit");
+            Console.WriteLine("22. Create Student Enrollment");
+            Console.WriteLine("23. Show All Student Enrollment");
+            Console.WriteLine("24. Delete Student Enrollment");
+
+
             string choice = Console.ReadLine();
 
             switch (choice)
@@ -161,6 +169,17 @@ class main_program
                     break;
                 case "21":
                     return;
+                case "22":
+                    StudentEnrollment studentEnrollment = EnrollStudentUI(studentService, courseService);
+                    studentEnrollmentService.EnrollStudent(studentEnrollment);
+                    break;
+                case "23":
+                    List<StudentEnrollment> studentEnrollments = studentEnrollmentService.GetStudentEnrollment();
+                    ShowAllStudentEnrollment(studentEnrollments);
+                    break;
+                case "24":
+                    DeleteStudentEnrollment();
+                    break;
                 default:
                     Console.WriteLine("Invalid choice. Please try again.");
                     break;
@@ -168,28 +187,22 @@ class main_program
         }
 
 
+        ////////////////////////////////////////////////////////
+
         static User AddUserUI()
         {
             Console.WriteLine("Enter User Details:");
-            Console.Write("UserId ID: ");
-            int userID = int.Parse(Console.ReadLine());
-            Console.Write("Name: ");
+            Console.Write("UserName: ");
             string userName = Console.ReadLine();
-            Console.Write("Address: ");
-            string userAddress = Console.ReadLine();
-            Console.Write("Email: ");
-            string userEmail = Console.ReadLine();
-            Console.Write("PhoneNumber: ");
-            string userPhonenumber = Console.ReadLine();
+            Console.Write("UserPassword: ");
+            string userPassword = Console.ReadLine();
 
             User user = new User
             (
-                userID,
                 userName,
-                userAddress,
-                userEmail,
-                userPhonenumber
+                userPassword
             );
+            Console.WriteLine("User created successfully.");
             return user;
         }
 
@@ -200,7 +213,7 @@ class main_program
             {
                 foreach (User user in users)
                 {
-                    Console.WriteLine($"UserId: {user.UserId}, UserName: {user.Name}, UserAddress: {user.Address}, Email: {user.Email}, PhoneNumber: {user.PhoneNumber}");
+                    Console.WriteLine($"UserId: {user.UserId}, UserName: {user.UserName}, UserPassword: {user.UserPassword}");
                 }
             }
             else
@@ -214,12 +227,10 @@ class main_program
 
         List<User> SelectUser()
         {
-            Console.WriteLine("Enter attribute to search by (ID, Name, Address, Email, phonenumber ):");
-            string attribute = Console.ReadLine();
-            Console.WriteLine("Enter value to search for:");
+            Console.WriteLine("Enter value to search User:");
             string value = Console.ReadLine().ToLower();
 
-            List<User> result = userService.SearchUser(attribute, value);
+            List<User> result = userService.SearchUser(value);
 
             return result;
 
@@ -232,7 +243,7 @@ class main_program
             {
                 foreach (User user in result)
                 {
-                    Console.WriteLine($"UserId: {user.UserId}, UserName: {user.Name}, UserAddress: {user.Address}, Email: {user.Email}, PhoneNumber: {user.PhoneNumber}");
+                    Console.WriteLine($"UserId: {user.UserId}, UserName: {user.UserName}, UserPassword: {user.UserPassword}");
                 }
             }
             else
@@ -245,46 +256,46 @@ class main_program
         {
             List<User> result = SelectUser();
 
-            if (result.Count > 0)
+            if (result.Count == 0)
             {
-                Console.WriteLine("Please select the user to update by entering the user ID:");
-                for (int i = 0; i < result.Count; i++)
-                {
-                    Console.WriteLine($"{i + 1}. UserId: {result[i].UserId}, UserName: {result[i].Name}, UserAddress: {result[i].Address}, Email: {result[i].Email}, PhoneNumber: {result[i].PhoneNumber}");
-                }
-                Console.Write("Enter user ID to update: ");
-                int id = int.Parse(Console.ReadLine());
-
-
-                User user = userService.GetUserById(id);
-                if (user == null)
-                {
-                    Console.WriteLine("User not found.");
-                    return;
-                }
-
-                Console.Write("Enter new name (leave blank to keep current): ");
-                string name = Console.ReadLine();
-                if (!string.IsNullOrEmpty(name)) user.Name = name;
-
-                Console.Write("Enter new Address (leave blank to keep current): ");
-                string address = Console.ReadLine();
-                if (!string.IsNullOrEmpty(address)) user.Address = address;
-
-                Console.Write("Enter new email (leave blank to keep current): ");
-                string email = Console.ReadLine();
-                if (!string.IsNullOrEmpty(email)) user.Email = email;
-
-                Console.Write("Enter new phoneNumber (leave blank to keep current): ");
-                string phoneNumber = Console.ReadLine();
-                if (!string.IsNullOrEmpty(phoneNumber)) user.PhoneNumber = phoneNumber;
-
-                Console.WriteLine("User updated successfully.");
-                userService.UpdateUser(user);
+                Console.WriteLine("No user found.");
+                return;
             }
-            else
+
+
+
+            Console.WriteLine("Please select the user to update by entering the user ID:");
+
+
+            foreach (User user1 in result)
             {
-                Console.WriteLine("No users found.");
+                Console.WriteLine($"UserId: {user1.UserId}, UserName: {user1.UserName}, UserPassword: {user1.UserPassword}");
+
+            }
+            Console.WriteLine();
+
+            Console.Write("Enter user ID to update: ");
+            int id = int.Parse(Console.ReadLine());
+
+            User currentUser = userService.GetUserById(id);
+
+            // Get user input and keep current values if input is empty
+            Console.Write($"Enter UserName ({currentUser.UserName}): ");
+            string input = Console.ReadLine();
+            currentUser.UserName = string.IsNullOrEmpty(input) ? currentUser.UserName : input;
+
+            Console.Write($"Enter UserPassword ({currentUser.UserPassword}): ");
+            input = Console.ReadLine();
+            currentUser.UserPassword = string.IsNullOrEmpty(input) ? currentUser.UserPassword : input;
+
+            try
+            {
+                userService.UpdateUser(id, currentUser);
+                Console.WriteLine($"User with ID {id} has been updated.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 
@@ -294,35 +305,38 @@ class main_program
 
             if (result.Count == 0)
             {
-                Console.WriteLine("No users found.");
+                Console.WriteLine("No User found.");
                 return;
             }
 
 
 
-            Console.WriteLine(" Please select the user to delete by entering the user ID:");
+            Console.WriteLine("Please select the user to delete by entering the user ID:");
 
-            for (int i = 0; i < result.Count; i++)
+            foreach (User user in result)
             {
-                Console.WriteLine($"{i + 1}. UserId: {result[i].UserId}, UserName: {result[i].Name}, UserAddress: {result[i].Address}, Email: {result[i].Email}, PhoneNumber: {result[i].PhoneNumber}");
+                Console.WriteLine($"UserId: {user.UserId}, UserName: {user.UserName}, UserPassword: {user.UserPassword}");
+
             }
+            Console.WriteLine();
 
             Console.Write("Enter user ID to delete: ");
             int id = int.Parse(Console.ReadLine());
 
-            User selectedUser = userService.GetUserById(id);
-            if (selectedUser == null)
-            {
-                Console.WriteLine("User not found.");
-                return;
-            }
 
-            studentService.DeleteStudent(selectedUser.UserId);
-            Console.WriteLine("User deleted successfully.");
+            try
+            {
+                userService.DeleteUser(id);
+                Console.WriteLine("User deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
 
-
+        ///////////////////////////////////////////////////////////////
 
         static Student CreateStudentUI()
         {
@@ -340,14 +354,6 @@ class main_program
             Console.Write("Gpa: ");
             string gpa = Console.ReadLine();
 
-
-            /*Student student = level.ToLower() switch
-            {
-                //"graduate" => new GraduateStudent(id, name, "", email, "", id, "Graduate", ""),
-                *//*"postgraduate" => new PostgraduateStudent(id, name, "", email, "", id, "Postgraduate", ""),
-                "phd" => new PhDStudent(id, name, "", email, "", id, "PhD", ""),*//*
-               // _ => throw new ArgumentException("Invalid level")
-            };*/
 
             Student student = new Student(name, address, email, phoneNumber, level, gpa);
 
@@ -373,8 +379,6 @@ class main_program
 
         List<Student> SelectStudent()
         {
-            /*Console.WriteLine("Enter attribute to search by (ID, Name, Email, Level):");
-            string attribute = Console.ReadLine();*/
             Console.WriteLine("Enter value to search student:");
             string value = Console.ReadLine().ToLower();
 
@@ -449,11 +453,10 @@ class main_program
             input = Console.ReadLine();
             currentStudent.Level = string.IsNullOrEmpty(input) ? currentStudent.Level : input;
 
-            // Handling GPA input
             Console.Write($"Enter GPA ({currentStudent.GPA}): ");
+            input = Console.ReadLine();
             currentStudent.GPA = string.IsNullOrEmpty(input) ? currentStudent.GPA : input;
 
-            input = Console.ReadLine();
             try
             {
                 studentService.UpdateStudent(id, currentStudent);
@@ -491,12 +494,7 @@ class main_program
            Console.Write("Enter student ID to delete: ");
             int id = int.Parse(Console.ReadLine());
 
-           /* Student selectedStudent = studentService.GetStudentById(id);
-            if (selectedStudent == null)
-            {
-                Console.WriteLine("Student not found.");
-                return;
-            }*/
+          
 
             try
             {
@@ -511,7 +509,7 @@ class main_program
         }
 
 
-
+        //////////////////////////////////////////////////////
 
         static Course CreateCourseUI()
         {
@@ -521,8 +519,6 @@ class main_program
             string description = Console.ReadLine();
             Console.WriteLine("Enter Level (Graduate, Postgraduate, PhD):");
             string level = Console.ReadLine();
-
-           
 
             try
             {
@@ -539,7 +535,7 @@ class main_program
             }
         }
 
-        static void ShowAllCourses(List<Course> courses)
+         static void ShowAllCourses(List<Course> courses)
         {
             if (courses.Count == 0)
             {
@@ -555,7 +551,7 @@ class main_program
 
         List<Course> SelectCourse()
         {
-            Console.WriteLine("Enter value to search for:");
+            Console.WriteLine("Enter value to search Course:");
             string value = Console.ReadLine().ToLower();
 
             List<Course> result = courseService.SearchCourses(value);
@@ -615,70 +611,73 @@ class main_program
 
         void UpdateCourse()
         {
-            var result = SelectCourse();
+            List<Course> result = SelectCourse();
 
             if (result.Count == 0)
             {
-                Console.WriteLine("No courses found.");
+                Console.WriteLine("No Course found.");
                 return;
             }
 
 
 
-            Console.WriteLine("Please select the course to update by entering the course ID:");
+            Console.WriteLine("Please select the Course to update by entering the Course ID:");
 
-            foreach (Course course in result)
+
+            foreach (Course course1 in result)
             {
-                Console.WriteLine($"ID: {course.CourseId}, Name: {course.CourseName}, Description: {course.Description}, Level: {course.Level}");
-            }
+                Console.WriteLine($"CourseId: {course1.CourseId}, CourseName: {course1.CourseName}, Description: {course1.Description}, Level: {course1.Level}");
 
-            Console.Write("Enter course ID to update: ");
+            }
+            Console.WriteLine();
+
+            Console.Write("Enter Course ID to update: ");
             int id = int.Parse(Console.ReadLine());
 
-            Course selectedCourse = courseService.GetCourseById(id);
-            if (selectedCourse == null)
-            {
-                Console.WriteLine("Course not found.");
-                return;
-            }
+            Course currentCourse = courseService.GetCourseById(id);
 
-            Console.WriteLine("Enter new name (or press Enter to keep current):");
-            string newName = Console.ReadLine();
-            if (!string.IsNullOrEmpty(newName))
-            {
-                selectedCourse.CourseName = newName;
-            }
+            // Get user input and keep current values if input is empty
+            Console.Write($"Enter CourseName ({currentCourse.CourseName}): ");
+            string input = Console.ReadLine();
+            currentCourse.CourseName = string.IsNullOrEmpty(input) ? currentCourse.CourseName : input;
 
-            Console.WriteLine("Enter new description (or press Enter to keep current):");
-            string newDescription = Console.ReadLine();
-            if (!string.IsNullOrEmpty(newDescription))
-            {
-                selectedCourse.Description = newDescription;
-            }
+            Console.Write($"Enter Description ({currentCourse.Description}): ");
+            input = Console.ReadLine();
+            currentCourse.Description = string.IsNullOrEmpty(input) ? currentCourse.Description : input;
 
-            Console.WriteLine("Enter new level (or press Enter to keep current):");
-            string newLevel = Console.ReadLine();
-            if (!string.IsNullOrEmpty(newLevel))
-            {
-                selectedCourse.Level = newLevel;
-            }
-            courseService.UpdateCourse(selectedCourse);
+            Console.Write($"Enter Level ({currentCourse.Level}): ");
+            input = Console.ReadLine();
+            currentCourse.Level = string.IsNullOrEmpty(input) ? currentCourse.Level : input;
 
-            Console.WriteLine("Course updated successfully.");
+            try
+            {
+                courseService.UpdateCourse(id, currentCourse);
+                Console.WriteLine($"Course with ID {id} has been updated.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         //////////////////////////////////////////////
         static Teacher CreateTeacherUI()
         {
             Console.WriteLine("Enter teacher details:");
-            Console.Write("ID: ");
-            int id = int.Parse(Console.ReadLine());
             Console.Write("Name: ");
             string name = Console.ReadLine();
+            Console.Write("Address: ");
+            string address = Console.ReadLine();
             Console.Write("Email: ");
             string email = Console.ReadLine();
+            Console.Write("PhoneNumber: ");
+            string phoneNumber = Console.ReadLine();
+            Console.Write("Department: ");
+            string department = Console.ReadLine();
+            Console.Write("Designation: ");
+            string designation = Console.ReadLine();
 
-            Teacher teacher = new Teacher(id, name, "", email, "", id);
+            Teacher teacher = new Teacher(name, address, email, phoneNumber, department, designation);
 
             Console.WriteLine("Teacher created successfully.");
             return teacher;
@@ -686,12 +685,10 @@ class main_program
 
         List<Teacher> SelectTeacher()
         {
-            Console.WriteLine("Enter attribute to search by (ID, Name, Email):");
-            string attribute = Console.ReadLine();
-            Console.WriteLine("Enter value to search for:");
+            Console.WriteLine("Enter value to search Teacher:");
             string value = Console.ReadLine().ToLower();
 
-            List<Teacher> result = teacherService.SearchTeachers(attribute, value);
+            List<Teacher> result = teacherService.SearchTeachers(value);
 
             return result;
 
@@ -705,7 +702,8 @@ class main_program
             {
                 foreach (Teacher teacher in result)
                 {
-                    Console.WriteLine($"ID: {teacher.TeacherID}, Name: {teacher.Name}, Email: {teacher.Email}");
+                    Console.WriteLine($"TeacherId: {teacher.TeacherId}, Name: {teacher.Name}, Address: {teacher.Address}, Email: {teacher.Email}, PhoneNumber: {teacher.PhoneNumber}, Department: {teacher.Department}, Designation: {teacher.Designation}");
+
                 }
             }
             else
@@ -718,38 +716,62 @@ class main_program
 
             List<Teacher> result = SelectTeacher();
 
-            if (result.Count > 0)
+            if (result.Count == 0)
             {
-                Console.WriteLine("Select a teacher to update:");
-                for (int i = 0; i < result.Count; i++)
-                {
-                    Console.WriteLine($"{i + 1}. ID: {result[i].TeacherID}, Name: {result[i].Name}, Email: {result[i].Email}");
-                }
-                Console.Write("Enter teacher ID to update: ");
-                int id = int.Parse(Console.ReadLine());
+                Console.WriteLine("No teacher found.");
+                return;
+            }
 
 
-                Teacher teacher = teacherService.GetTeacherById(id);
-                if (teacher == null)
-                {
-                    Console.WriteLine("Teacher not found.");
-                    return;
-                }
-                Console.Write("Enter new name (leave blank to keep current): ");
-                string name = Console.ReadLine();
-                if (!string.IsNullOrEmpty(name)) teacher.Name = name;
 
-                Console.Write("Enter new email (leave blank to keep current): ");
-                string email = Console.ReadLine();
-                if (!string.IsNullOrEmpty(email)) teacher.Email = email;
-                teacherService.UpdateTeacher(teacher);
+            Console.WriteLine("Please select the teacher to update by entering the teacher ID:");
 
-                Console.WriteLine("Teacher updated successfully.");
+
+            foreach (Teacher teacher1 in result)
+            {
+                Console.WriteLine($"TeacherId: {teacher1.TeacherId}, Name: {teacher1.Name}, Address: {teacher1.Address}, Email: {teacher1.Email}, PhoneNumber: {teacher1.PhoneNumber}, Department: {teacher1.Department}, Designation: {teacher1.Designation}");
 
             }
-            else
+            Console.WriteLine();
+
+            Console.Write("Enter teacher ID to update: ");
+            int id = int.Parse(Console.ReadLine());
+
+            Teacher currentTeacher = teacherService.GetTeacherById(id);
+
+            // Get user input and keep current values if input is empty
+            Console.Write($"Enter Name ({currentTeacher.Name}): ");
+            string input = Console.ReadLine();
+            currentTeacher.Name = string.IsNullOrEmpty(input) ? currentTeacher.Name : input;
+
+            Console.Write($"Enter Address ({currentTeacher.Address}): ");
+            input = Console.ReadLine();
+            currentTeacher.Address = string.IsNullOrEmpty(input) ? currentTeacher.Address : input;
+
+            Console.Write($"Enter Email ({currentTeacher.Email}): ");
+            input = Console.ReadLine();
+            currentTeacher.Email = string.IsNullOrEmpty(input) ? currentTeacher.Email : input;
+
+            Console.Write($"Enter Phone Number ({currentTeacher.PhoneNumber}): ");
+            input = Console.ReadLine();
+            currentTeacher.PhoneNumber = string.IsNullOrEmpty(input) ? currentTeacher.PhoneNumber : input;
+
+            Console.Write($"Enter Department ({currentTeacher.Department}): ");
+            input = Console.ReadLine();
+            currentTeacher.Department = string.IsNullOrEmpty(input) ? currentTeacher.Department : input;
+
+            Console.Write($"Enter Designation ({currentTeacher.Designation}): ");
+            input = Console.ReadLine();
+            currentTeacher.Designation = string.IsNullOrEmpty(input) ? currentTeacher.Designation : input;
+
+            try
             {
-                Console.WriteLine("No teachers found.");
+                teacherService.UpdateTeacher(id, currentTeacher);
+                Console.WriteLine($"Teacher with ID {id} has been updated.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
         }
 
@@ -766,25 +788,27 @@ class main_program
 
 
 
-            Console.WriteLine(" Please select the teacher to delete by entering the teacher ID:");
+            Console.WriteLine("Please select the teacher to delete by entering the teacher ID:");
 
-            for (int i = 0; i < result.Count; i++)
+            foreach (Teacher teacher in result)
             {
-                Console.WriteLine($"{i + 1}. ID: {result[i].TeacherID}, Name: {result[i].Name}, Email: {result[i].Email}");
+                Console.WriteLine($"TeacherId: {teacher.TeacherId}, Name: {teacher.Name}, Address: {teacher.Address}, Email: {teacher.Email}, PhoneNumber: {teacher.PhoneNumber}, Department: {teacher.Department}, Designation: {teacher.Designation}");
+
             }
+            Console.WriteLine();
 
             Console.Write("Enter teacher ID to delete: ");
             int id = int.Parse(Console.ReadLine());
 
-            Teacher selectedTeacher = teacherService.GetTeacherById(id);
-            if (selectedTeacher == null)
+            try
             {
-                Console.WriteLine("Teacher not found.");
-                return;
+                teacherService.DeleteTeacher(id);
+                Console.WriteLine("Teacher deleted successfully.");
             }
-            teacherService.DeleteTeacher(selectedTeacher.TeacherID);
-
-            Console.WriteLine("Teacher deleted successfully.");
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
 
         static void ShowAllTeacher(List<Teacher> teachers)
@@ -793,14 +817,76 @@ class main_program
 
             if (teachers.Count > 0)
             {
-                foreach (var teacher in teachers)
+                foreach (Teacher teacher in teachers)
                 {
-                    Console.WriteLine($"ID: {teacher.TeacherID}, Name: {teacher.Name}, Email: {teacher.Email}");
+                    Console.WriteLine($"TeacherId: {teacher.TeacherId}, Name: {teacher.Name}, Address: {teacher.Address}, Email: {teacher.Email}, PhoneNumber: {teacher.PhoneNumber}, Department: {teacher.Department}, Designation: {teacher.Designation}");
+
                 }
             }
             else
             {
                 Console.WriteLine("No teachers found.");
+            }
+
+        }
+
+        static StudentEnrollment EnrollStudentUI(StudentService studentService, CourseService courseService)
+        {
+            List<Student> students = studentService.GetAllStudents();
+            ShowAllStudent(students);
+            Console.WriteLine();
+
+            List<Course> courses = courseService.GetAllCourses();
+            ShowAllCourses(courses);
+            Console.WriteLine();
+
+            Console.WriteLine("Enter StudentId and CourseId for Enrollment:");
+            Console.Write("StudentId: ");
+            int studentId = int.Parse(Console.ReadLine());
+            Console.Write("CourseId: ");
+            int courseId = int.Parse(Console.ReadLine());
+            
+
+            StudentEnrollment studentEnrollment = new StudentEnrollment(studentId, courseId);
+
+            
+            return studentEnrollment;
+        }
+
+        static void ShowAllStudentEnrollment(List<StudentEnrollment> studentEnrollments)
+        {
+
+            if (studentEnrollments.Count > 0)
+            {
+                foreach (StudentEnrollment studentEnrollment in studentEnrollments)
+                {
+                    Console.WriteLine($"StudentEnrollmentId: {studentEnrollment.StudentEnrollmentId}, StudentID: {studentEnrollment.StudentID}, CourseId: {studentEnrollment.CourseId}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No StudentEnrollment found.");
+            }
+        }
+
+        void DeleteStudentEnrollment()
+        {
+            Console.WriteLine("Please select the StudentEnrollment to delete by entering the StudentEnrollment ID:");
+            List<StudentEnrollment> result = studentEnrollmentService.GetStudentEnrollment();
+            ShowAllStudentEnrollment(result);
+            Console.WriteLine();
+
+            Console.Write("Enter StudentEnrollment ID to delete: ");
+            int id = int.Parse(Console.ReadLine());
+
+            try
+            {
+                studentEnrollmentService.DeleteEnrollment(id);
+                Console.WriteLine("StudentEnrollment deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
 
         }
