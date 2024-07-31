@@ -1,4 +1,6 @@
-﻿using Domain.Classes;
+﻿using DAL.Models;
+using DAL.ViewModels;
+using Domain.Classes;
 using Domain.interfaces;
 using System;
 using System.Collections.Generic;
@@ -19,9 +21,76 @@ namespace DAL.ORM
             Console.WriteLine($"Teacher is managing courses.");
         }
 
-        public void UpdateAttendance()
+        public void TakeAttendance(Attendance attendance)
         {
-            Console.WriteLine($"Teacher updated attendance.");
+            string _cmdInsert = "INSERT INTO attendance (StudentEnrollmentId, AttendanceDate, Status) VALUES (?, ?, ?)";
+
+            OdbcCommand cmd1 = new OdbcCommand(_cmdInsert);
+
+            //cmd.CommandText(_cmdInsert);
+            cmd1.Parameters.AddWithValue("@StudentEnrollmentId", attendance.StudentEnrollmentId);
+            cmd1.Parameters.AddWithValue("@AttendanceDate", attendance.AttendanceDate);
+            cmd1.Parameters.AddWithValue("@Status", attendance.Status);
+
+
+            DBConnection.ExecuteNonQueryAndScalar(cmd1);
+        }
+
+        public List<AttendanceView> GetAllAttendanceView()
+        {
+            string _cmdSelect = @"SELECT 
+                                    a.AttendanceId, 
+                                    s.StudentID, 
+                                    s.Name, 
+                                    c.CourseName, 
+                                    a.AttendanceDate,
+                                    a.Status
+                                FROM 
+                                    Attendance a
+                                JOIN 
+                                    StudentEnrollment se ON a.StudentEnrollmentId = se.StudentEnrollmentId
+                                JOIN 
+                                    Student s ON se.StudentID = s.StudentID
+                                JOIN 
+                                    Course c ON se.CourseId = c.CourseId;
+                                ";
+
+            OdbcCommand cmd = new OdbcCommand(_cmdSelect);
+            List<AttendanceView> attendanceList = GetAsAttendanceListView(DBConnection.ExecuteQuery(cmd).Tables[0]);
+
+            return attendanceList;
+        }
+
+        internal List<AttendanceView> GetAsAttendanceListView(DataTable dt)
+        {
+            List<AttendanceView> ItemList = new List<AttendanceView>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                AttendanceView ItemObj = new AttendanceView();
+
+                if (!string.IsNullOrEmpty(dr["AttendanceId"].ToString()))
+                    ItemObj.AttendanceId = Convert.ToInt32(dr["AttendanceId"]);
+
+                if (!string.IsNullOrEmpty(dr["StudentID"].ToString()))
+                    ItemObj.StudentID = Convert.ToInt32(dr["StudentID"]);
+
+                if (!string.IsNullOrEmpty(dr["Name"].ToString()))
+                    ItemObj.Name = Convert.ToString(dr["Name"]);
+
+                if (!string.IsNullOrEmpty(dr["CourseName"].ToString()))
+                    ItemObj.CourseName = Convert.ToString(dr["CourseName"]);
+
+                if (!string.IsNullOrEmpty(dr["AttendanceDate"].ToString()))
+                    ItemObj.AttendanceDate = Convert.ToString(dr["AttendanceDate"]);
+
+                if (!string.IsNullOrEmpty(dr["Status"].ToString()))
+                    ItemObj.Status = Convert.ToString(dr["Status"]);
+
+
+
+                ItemList.Add(ItemObj);
+            }
+            return ItemList;
         }
 
         public void GradeStudents()
@@ -34,9 +103,249 @@ namespace DAL.ORM
             Console.WriteLine($"Teacher is supervising research.");
         }
 
-        public void TakeExam()
+        public void TakeExam(Exam exam)
         {
-            Console.WriteLine($"Teacher is taking exam.");
+            string _cmdInsert = "INSERT INTO exam (CourseId, ExamDate, ExamType) VALUES (?, ?, ?)";
+
+            OdbcCommand cmd1 = new OdbcCommand(_cmdInsert);
+
+            //cmd.CommandText(_cmdInsert);
+            cmd1.Parameters.AddWithValue("@CourseId", exam.CourseId);
+            cmd1.Parameters.AddWithValue("@ExamDate", exam.ExamDate);
+            cmd1.Parameters.AddWithValue("@ExamType", exam.ExamType);
+
+
+            DBConnection.ExecuteNonQueryAndScalar(cmd1);
+        }
+
+        public List<ExamView> GetAllExamView()
+        {
+            string _cmdSelect = @"SELECT e.ExamId, c.CourseName, e.ExamDate, e.ExamType FROM exam AS e
+                                JOIN course AS c   ON c.CourseId = e.CourseId;";
+
+            OdbcCommand cmd = new OdbcCommand(_cmdSelect);
+            List<ExamView> examList = GetAsExamListView(DBConnection.ExecuteQuery(cmd).Tables[0]);
+
+            return examList;
+        }
+
+        internal List<ExamView> GetAsExamListView(DataTable dt)
+        {
+            List<ExamView> ItemList = new List<ExamView>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                ExamView ItemObj = new ExamView();
+
+                if (!string.IsNullOrEmpty(dr["ExamId"].ToString()))
+                    ItemObj.ExamId = Convert.ToInt32(dr["ExamId"]);
+
+                if (!string.IsNullOrEmpty(dr["CourseName"].ToString()))
+                    ItemObj.CourseName = Convert.ToString(dr["CourseName"]);
+
+                if (!string.IsNullOrEmpty(dr["ExamDate"].ToString()))
+                    ItemObj.ExamDate = Convert.ToString(dr["ExamDate"]);
+
+                if (!string.IsNullOrEmpty(dr["ExamType"].ToString()))
+                    ItemObj.ExamType = Convert.ToString(dr["ExamType"]);
+
+
+
+                ItemList.Add(ItemObj);
+            }
+            return ItemList;
+        }
+
+        public void DeleteExam(int examId)
+        {
+            try
+            {
+                // Define the SQL delete command with a placeholder for the ID
+                string _cmdDelete = "DELETE FROM exam WHERE ExamId = ?";
+
+                // Create an OdbcCommand object
+                OdbcCommand cmd1 = new OdbcCommand(_cmdDelete);
+
+                // Add the parameter for the ID
+                cmd1.Parameters.AddWithValue("@ExamId", examId);
+
+                // Execute the delete command
+                DBConnection.ExecuteNonQueryAndScalar(cmd1);
+
+            }
+            catch (Exception Ex)
+            {
+
+                throw Ex;
+            }
+
+        }
+
+        public void ExamResult(ExamResult examResult)
+        {
+            string _cmdInsert = "INSERT INTO examresult (ExamId, StudentID, Score) VALUES (?, ?, ?)";
+
+            OdbcCommand cmd1 = new OdbcCommand(_cmdInsert);
+
+            //cmd.CommandText(_cmdInsert);
+            cmd1.Parameters.AddWithValue("@ExamId", examResult.ExamId);
+            cmd1.Parameters.AddWithValue("@StudentID", examResult.StudentID);
+            cmd1.Parameters.AddWithValue("@Score", examResult.Score);
+
+
+            DBConnection.ExecuteNonQueryAndScalar(cmd1);
+        }
+
+        public List<ResultView> GetAllResultView()
+        {
+            string _cmdSelect = @"SELECT 
+                                   er.ResultId,
+                                   e.ExamId,
+                                   s.StudentID,
+                                   s.Name,
+                                   c.CourseName,
+                                   er.Score
+                                FROM 
+                                    examresult er
+                                JOIN 
+                                    exam e ON e.ExamId = er.ExamId
+                                JOIN 
+                                    Student s ON s.StudentID = er.StudentID
+                                JOIN 
+                                    Course c ON c.CourseId = e.CourseId;
+                                ";
+
+            OdbcCommand cmd = new OdbcCommand(_cmdSelect);
+            List<ResultView> resultList = GetAsResultListView(DBConnection.ExecuteQuery(cmd).Tables[0]);
+
+            return resultList;
+        }
+
+        internal List<ResultView> GetAsResultListView(DataTable dt)
+        {
+            List<ResultView> ItemList = new List<ResultView>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                ResultView ItemObj = new ResultView();
+
+                if (!string.IsNullOrEmpty(dr["ResultId"].ToString()))
+                    ItemObj.ResultId = Convert.ToInt32(dr["ResultId"]);
+
+                if (!string.IsNullOrEmpty(dr["ExamId"].ToString()))
+                    ItemObj.ExamId = Convert.ToInt32(dr["ExamId"]);
+
+                if (!string.IsNullOrEmpty(dr["StudentID"].ToString()))
+                    ItemObj.StudentID = Convert.ToInt32(dr["StudentID"]);
+
+                if (!string.IsNullOrEmpty(dr["Name"].ToString()))
+                    ItemObj.Name = Convert.ToString(dr["Name"]);
+
+                if (!string.IsNullOrEmpty(dr["CourseName"].ToString()))
+                    ItemObj.CourseName = Convert.ToString(dr["CourseName"]);
+
+                if (!string.IsNullOrEmpty(dr["Score"].ToString()))
+                    ItemObj.Score = Convert.ToString(dr["Score"]);
+
+
+                ItemList.Add(ItemObj);
+            }
+            return ItemList;
+        }
+
+        public void DeleteResult(int resultId)
+        {
+            try
+            {
+                // Define the SQL delete command with a placeholder for the ID
+                string _cmdDelete = "DELETE FROM examresult WHERE ResultId = ?";
+
+                // Create an OdbcCommand object
+                OdbcCommand cmd1 = new OdbcCommand(_cmdDelete);
+
+                // Add the parameter for the ID
+                cmd1.Parameters.AddWithValue("@ResultId", resultId);
+
+                // Execute the delete command
+                DBConnection.ExecuteNonQueryAndScalar(cmd1);
+
+            }
+            catch (Exception Ex)
+            {
+
+                throw Ex;
+            }
+
+        }
+
+        public void AssignedTeacher(AssignedTeacher assignedTeacher)
+        {
+            string _cmdInsert = "INSERT INTO assignedteacher (TeacherId, CourseId) VALUES (?, ?)";
+
+            OdbcCommand cmd1 = new OdbcCommand(_cmdInsert);
+
+            //cmd.CommandText(_cmdInsert);
+            cmd1.Parameters.AddWithValue("@TeacherId", assignedTeacher.TeacherId);
+            cmd1.Parameters.AddWithValue("@CourseId", assignedTeacher.CourseId);
+
+            DBConnection.ExecuteNonQueryAndScalar(cmd1);
+        }
+
+        public List<AssignedTeacherView> GetAllAssignedTeacherView()
+        {
+            string _cmdSelect = @"SELECT at.AssignedTeacherId, t.Name, c.CourseName FROM assignedteacher AS at 
+                                JOIN teacher AS t  ON t.TeacherId = at.TeacherId 
+                                JOIN course AS c   ON c.CourseId = at.CourseId;";
+
+            OdbcCommand cmd = new OdbcCommand(_cmdSelect);
+            List<AssignedTeacherView> assignedTeacherList = GetAsListView(DBConnection.ExecuteQuery(cmd).Tables[0]);
+
+            return assignedTeacherList;
+        }
+
+        internal List<AssignedTeacherView> GetAsListView(DataTable dt)
+        {
+            List<AssignedTeacherView> ItemList = new List<AssignedTeacherView>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                AssignedTeacherView ItemObj = new AssignedTeacherView();
+
+                if (!string.IsNullOrEmpty(dr["AssignedTeacherId"].ToString()))
+                    ItemObj.AssignedTeacherId = Convert.ToInt32(dr["AssignedTeacherId"]);
+
+                if (!string.IsNullOrEmpty(dr["Name"].ToString()))
+                    ItemObj.Name = Convert.ToString(dr["Name"]);
+
+                if (!string.IsNullOrEmpty(dr["CourseName"].ToString()))
+                    ItemObj.CourseName = Convert.ToString(dr["CourseName"]);
+
+
+                ItemList.Add(ItemObj);
+            }
+            return ItemList;
+        }
+
+        public void DeleteAssignedTeacher(int assignedTeacherId)
+        {
+            try
+            {
+                // Define the SQL delete command with a placeholder for the ID
+                string _cmdDelete = "DELETE FROM assignedteacher WHERE AssignedTeacherId = ?";
+
+                // Create an OdbcCommand object
+                OdbcCommand cmd1 = new OdbcCommand(_cmdDelete);
+
+                // Add the parameter for the ID
+                cmd1.Parameters.AddWithValue("@AssignedTeacherId", assignedTeacherId);
+
+                // Execute the delete command
+                DBConnection.ExecuteNonQueryAndScalar(cmd1);
+
+            }
+            catch (Exception Ex)
+            {
+
+                throw Ex;
+            }
+
         }
 
         public List<Teacher> GetAllTeachers()

@@ -1,4 +1,5 @@
 ﻿using DAL.ORM;
+using DAL.ViewModels;
 using Domain.Classes;
 using System;
 using System.Collections.Generic;
@@ -30,6 +31,11 @@ namespace BLL.Services
         public List<StudentEnrollment> GetStudentEnrollment()
         {
             return _studentEnrollmentAction.GetAllStudentEnrollment();
+        }
+
+        public List<StudentEnrollmentView> GetStudentEnrollmentView()
+        {
+            return _studentEnrollmentAction.GetAllStudentEnrollmentView();
         }
     }
 }

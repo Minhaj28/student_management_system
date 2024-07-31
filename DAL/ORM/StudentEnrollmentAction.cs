@@ -1,4 +1,5 @@
-﻿using Domain.Classes;
+﻿using DAL.ViewModels;
+using Domain.Classes;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -65,6 +66,9 @@ namespace DAL.ORM
         public List<StudentEnrollment> GetAllStudentEnrollment()
         {
             string _cmdSelect = "select * from studentenrollment";
+            /*string _cmdSelect = @"SELECT se.StudentEnrollmentId, s.Name, c.CourseName FROM studentenrollment AS se 
+                                JOIN student AS s  ON s.StudentID = se.StudentID 
+                                JOIN course AS c   ON c.CourseId = se.CourseId;";*/
 
             OdbcCommand cmd = new OdbcCommand(_cmdSelect);
             List<StudentEnrollment> studentEnrollmentList = GetAsList(DBConnection.ExecuteQuery(cmd).Tables[0]);
@@ -87,6 +91,40 @@ namespace DAL.ORM
 
                 if (!string.IsNullOrEmpty(dr["CourseId"].ToString()))
                     ItemObj.CourseId = Convert.ToInt32(dr["CourseId"]);
+
+
+                ItemList.Add(ItemObj);
+            }
+            return ItemList;
+        }
+
+        public List<StudentEnrollmentView> GetAllStudentEnrollmentView()
+        {
+            string _cmdSelect = @"SELECT se.StudentEnrollmentId, s.Name, c.CourseName FROM studentenrollment AS se 
+                                JOIN student AS s  ON s.StudentID = se.StudentID 
+                                JOIN course AS c   ON c.CourseId = se.CourseId;";
+
+            OdbcCommand cmd = new OdbcCommand(_cmdSelect);
+            List<StudentEnrollmentView> studentEnrollmentList = GetAsListView(DBConnection.ExecuteQuery(cmd).Tables[0]);
+
+            return studentEnrollmentList;
+        }
+
+        internal List<StudentEnrollmentView> GetAsListView(DataTable dt)
+        {
+            List<StudentEnrollmentView> ItemList = new List<StudentEnrollmentView>();
+            foreach (DataRow dr in dt.Rows)
+            {
+                StudentEnrollmentView ItemObj = new StudentEnrollmentView();
+
+                if (!string.IsNullOrEmpty(dr["StudentEnrollmentId"].ToString()))
+                    ItemObj.StudentEnrollmentId = Convert.ToInt32(dr["StudentEnrollmentId"]);
+
+                if (!string.IsNullOrEmpty(dr["Name"].ToString()))
+                    ItemObj.Name = Convert.ToString(dr["Name"]);
+
+                if (!string.IsNullOrEmpty(dr["CourseName"].ToString()))
+                    ItemObj.CourseName = Convert.ToString(dr["CourseName"]);
 
 
                 ItemList.Add(ItemObj);

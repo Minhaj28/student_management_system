@@ -1,5 +1,7 @@
 ﻿using BLL.Interfaces;
+using DAL.Models;
 using DAL.ORM;
+using DAL.ViewModels;
 using Domain.Classes;
 using System;
 using System.Collections.Generic;
@@ -23,9 +25,14 @@ namespace BLL.Services
             Console.WriteLine($"Teacher is managing courses.");
         }
 
-        public void UpdateAttendance()
+        public void TakeAttendance(Attendance attendance)
         {
-            Console.WriteLine($"Teacher updated attendance.");
+           _teacherAction.TakeAttendance(attendance);
+        }
+
+        public List<AttendanceView> GetAttendanceView()
+        {
+            return _teacherAction.GetAllAttendanceView();
         }
 
         public void GradeStudents()
@@ -38,11 +45,48 @@ namespace BLL.Services
             Console.WriteLine($"Teacher is supervising research.");
         }
 
-        public void TakeExam()
+        public void ExamResult(ExamResult examResult)
         {
-            Console.WriteLine($"Teacher is taking exam.");
+            _teacherAction.ExamResult(examResult);
         }
 
+        public List<ResultView> GetResultView()
+        {
+            return _teacherAction.GetAllResultView();
+        }
+
+        public void DeleteResult(int id)
+        {
+            _teacherAction.DeleteResult(id);
+        }
+        public void TakeExam(Exam exam)
+        {
+           _teacherAction.TakeExam(exam);
+        }
+
+        public List<ExamView> GetExamView()
+        {
+            return _teacherAction.GetAllExamView();
+        }
+
+        public void DeleteExam(int id)
+        {
+            _teacherAction.DeleteExam(id);
+        }
+        public void AssignedTeacher(AssignedTeacher assignedTeacher)
+        {
+            _teacherAction.AssignedTeacher(assignedTeacher);
+        }
+
+        public List<AssignedTeacherView> GetAssignedTeacherView()
+        {
+            return _teacherAction.GetAllAssignedTeacherView();
+        }
+
+        public void DeleteAssignedTeacher(int id)
+        {
+            _teacherAction.DeleteAssignedTeacher(id);
+        }
         public List<Teacher> GetAllTeachers()
         {
             return _teacherAction.GetAllTeachers();

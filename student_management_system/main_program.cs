@@ -7,7 +7,9 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using BLL.Interfaces;
 using BLL.Services;
+using DAL.Models;
 using DAL.ORM;
+using DAL.ViewModels;
 using Domain.Classes;
 
 class main_program
@@ -93,7 +95,17 @@ class main_program
             Console.WriteLine("22. Create Student Enrollment");
             Console.WriteLine("23. Show All Student Enrollment");
             Console.WriteLine("24. Delete Student Enrollment");
-
+            Console.WriteLine("25. Assign Teacher");
+            Console.WriteLine("26. Show All Assigned Teacher");
+            Console.WriteLine("27. Delete Assigned Teacher");
+            Console.WriteLine("28. Create Exam");
+            Console.WriteLine("29. Show All Exam");
+            Console.WriteLine("30. Delete Exam");
+            Console.WriteLine("31. Create ExamResult");
+            Console.WriteLine("32. Show All ExamResult");
+            Console.WriteLine("33. Delete ExamResult");
+            Console.WriteLine("34. Take Attendance");
+            Console.WriteLine("35. Show All Attendance");
 
             string choice = Console.ReadLine();
 
@@ -174,11 +186,52 @@ class main_program
                     studentEnrollmentService.EnrollStudent(studentEnrollment);
                     break;
                 case "23":
-                    List<StudentEnrollment> studentEnrollments = studentEnrollmentService.GetStudentEnrollment();
-                    ShowAllStudentEnrollment(studentEnrollments);
+                    List<StudentEnrollmentView> studentEnrollmentsView = studentEnrollmentService.GetStudentEnrollmentView();
+                    ShowAllStudentEnrollment(studentEnrollmentsView);
                     break;
                 case "24":
                     DeleteStudentEnrollment();
+                    break;
+                case "25":
+                    AssignedTeacher assignedTeacher = AssignedTeacherUI(teacherService, courseService);
+                    teacherService.AssignedTeacher(assignedTeacher);
+                    break;
+                case "26":
+                    List<AssignedTeacherView> assignedTeacherView = teacherService.GetAssignedTeacherView();
+                    ShowAllAssignedTeacher(assignedTeacherView);
+                    break;
+                case "27":
+                    DeleteAssignedTeacher();
+                    break;
+                case "28":
+                    Exam exam = CreateExamUI(courseService);
+                    teacherService.TakeExam(exam);
+                    break;
+                case "29":
+                    List<ExamView> examView = teacherService.GetExamView();
+                    ShowAllExam(examView);
+                    break;
+                case "30":
+                    DeleteExam();
+                    break;
+                case "31":
+                    ExamResult examResult = CreateExamResultUI(teacherService, studentService);
+                    teacherService.ExamResult(examResult);
+                    break;
+                case "32":
+                    List<ResultView> sesultView = teacherService.GetResultView();
+                    ShowAllResult(sesultView);
+                    break;
+                case "33":
+                    DeleteResult();
+                    break;
+                case "34":
+                    Attendance attendance = TakeAttendanceUI(studentEnrollmentService);
+                    teacherService.TakeAttendance(attendance);
+                    break;
+                case "35":
+                    List<AttendanceView> attendanceView = teacherService.GetAttendanceView();
+                    ShowAllAttendance(attendanceView);
                     break;
                 default:
                     Console.WriteLine("Invalid choice. Please try again.");
@@ -830,6 +883,8 @@ class main_program
 
         }
 
+        ////////////////////////////////////////////////
+
         static StudentEnrollment EnrollStudentUI(StudentService studentService, CourseService courseService)
         {
             List<Student> students = studentService.GetAllStudents();
@@ -853,14 +908,14 @@ class main_program
             return studentEnrollment;
         }
 
-        static void ShowAllStudentEnrollment(List<StudentEnrollment> studentEnrollments)
+        static void ShowAllStudentEnrollment(List<StudentEnrollmentView> studentEnrollmentsView)
         {
 
-            if (studentEnrollments.Count > 0)
+            if (studentEnrollmentsView.Count > 0)
             {
-                foreach (StudentEnrollment studentEnrollment in studentEnrollments)
+                foreach (StudentEnrollmentView studentEnrollment in studentEnrollmentsView)
                 {
-                    Console.WriteLine($"StudentEnrollmentId: {studentEnrollment.StudentEnrollmentId}, StudentID: {studentEnrollment.StudentID}, CourseId: {studentEnrollment.CourseId}");
+                    Console.WriteLine($"StudentEnrollmentId: {studentEnrollment.StudentEnrollmentId}, StudentName: {studentEnrollment.Name}, CourseName: {studentEnrollment.CourseName}");
                 }
             }
             else
@@ -872,7 +927,7 @@ class main_program
         void DeleteStudentEnrollment()
         {
             Console.WriteLine("Please select the StudentEnrollment to delete by entering the StudentEnrollment ID:");
-            List<StudentEnrollment> result = studentEnrollmentService.GetStudentEnrollment();
+            List<StudentEnrollmentView> result = studentEnrollmentService.GetStudentEnrollmentView();
             ShowAllStudentEnrollment(result);
             Console.WriteLine();
 
@@ -890,6 +945,249 @@ class main_program
             }
 
         }
+
+
+        //////////////////////////////////////////
+        static AssignedTeacher AssignedTeacherUI(TeacherService teacherService, CourseService courseService)
+        {
+            List<Teacher> teachers = teacherService.GetAllTeachers();
+            ShowAllTeacher(teachers);
+            Console.WriteLine();
+
+            List<Course> courses = courseService.GetAllCourses();
+            ShowAllCourses(courses);
+            Console.WriteLine();
+
+            Console.WriteLine("Enter TeacherId and CourseId for Enrollment:");
+            Console.Write("TeacherId: ");
+            int teacherId = int.Parse(Console.ReadLine());
+            Console.Write("CourseId: ");
+            int courseId = int.Parse(Console.ReadLine());
+
+
+            AssignedTeacher assignedTeacher = new AssignedTeacher(teacherId, courseId);
+
+            Console.WriteLine("AssignedTeacher successfully.");
+
+            return assignedTeacher;
+
+        }
+
+
+        static void ShowAllAssignedTeacher(List<AssignedTeacherView> assignedTeacherView)
+        {
+
+            if (assignedTeacherView.Count > 0)
+            {
+                foreach (AssignedTeacherView assignedTeacher in assignedTeacherView)
+                {
+                    Console.WriteLine($"AssignedTeacherId: {assignedTeacher.AssignedTeacherId}, TeacherName: {assignedTeacher.Name}, CourseName: {assignedTeacher.CourseName}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No AssignedTeacher found.");
+            }
+        }
+
+        void DeleteAssignedTeacher()
+        {
+            Console.WriteLine("Please select the AssignedTeacher to delete by entering the AssignedTeacher ID:");
+            List<AssignedTeacherView> result = teacherService.GetAssignedTeacherView();
+            ShowAllAssignedTeacher(result);
+            Console.WriteLine();
+
+            Console.Write("Enter AssignedTeacher ID to delete: ");
+            int id = int.Parse(Console.ReadLine());
+
+            try
+            {
+                teacherService.DeleteAssignedTeacher(id);
+                Console.WriteLine("AssignedTeacher deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+
+
+        ///////////////////////////////////////////////////
+
+        static Exam CreateExamUI(CourseService courseService)
+        {
+            Console.WriteLine("All Course");
+            List<Course> courses = courseService.GetAllCourses();
+            ShowAllCourses(courses);
+            Console.WriteLine();
+
+            Console.WriteLine("Enter CourseId, ExamDate and ExamType for Create Exam:");
+            Console.Write("CourseId: ");
+            int courseId = int.Parse(Console.ReadLine());
+            Console.Write("ExamDate: ");
+            string examDate = Console.ReadLine();
+            Console.Write("ExamType: ");
+            string examType = Console.ReadLine();
+
+
+            Exam exam = new Exam(courseId, examDate, examType);
+
+            Console.WriteLine("Eaxm created successfully.");
+
+            return exam;
+
+        }
+
+        static void ShowAllExam(List<ExamView> examView)
+        {
+
+            if (examView.Count > 0)
+            {
+                foreach (ExamView exam in examView)
+                {
+                    Console.WriteLine($"ExamId: {exam.ExamId}, CourseName: {exam.CourseName}, ExamDate: {exam.ExamType}, ExamDate: {exam.ExamType}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No Exam found.");
+            }
+        }
+
+        void DeleteExam()
+        {
+            Console.WriteLine("Please select the Exam to delete by entering the Eaxm ID:");
+            List<ExamView> result = teacherService.GetExamView();
+            ShowAllExam(result);
+            Console.WriteLine();
+
+            Console.Write("Enter Exam ID to delete: ");
+            int id = int.Parse(Console.ReadLine());
+
+            try
+            {
+                teacherService.DeleteExam(id);
+                Console.WriteLine("Exam deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+
+        ///////////////////////////////////////////////////
+        static ExamResult CreateExamResultUI(TeacherService teacherService, StudentService studentService)
+        {
+            Console.WriteLine("All Exam:");
+            List<ExamView> examView = teacherService.GetExamView();
+            ShowAllExam(examView);
+            Console.WriteLine();
+
+            Console.WriteLine("All Student:");
+            List<Student> students = studentService.GetAllStudents();
+            ShowAllStudent(students);
+            Console.WriteLine();
+
+            Console.WriteLine("Enter ExamId, StudentId and Score for Create Result:");
+            Console.Write("ExamId: ");
+            int examId = int.Parse(Console.ReadLine());
+            Console.Write("StudentId: ");
+            int studentId = int.Parse(Console.ReadLine());
+            Console.Write("Score: ");
+            string score = Console.ReadLine();
+
+
+            ExamResult examResult = new ExamResult(examId, studentId, score);
+
+            Console.WriteLine("Create Result successfully.");
+
+            return examResult;
+
+        }
+
+        static void ShowAllResult(List<ResultView> resultView)
+        {
+
+            if (resultView.Count > 0)
+            {
+                foreach (ResultView result in resultView)
+                {
+                    Console.WriteLine($"ResultId: {result.ResultId}, ExamId: {result.ExamId}, StudentId: {result.StudentID}, StudentName: {result.Name}, CourseName: {result.CourseName}, Score: {result.Score}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No Result found.");
+            }
+        }
+
+        void DeleteResult()
+        {
+            Console.WriteLine("Please select the Result to delete by entering the Result ID:");
+            List<ResultView> result = teacherService.GetResultView();
+            ShowAllResult(result);
+            Console.WriteLine();
+
+            Console.Write("Enter Result ID to delete: ");
+            int id = int.Parse(Console.ReadLine());
+
+            try
+            {
+                teacherService.DeleteResult(id);
+                Console.WriteLine("Result deleted successfully.");
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+
+
+        ///////////////////////////////////////////////////////////////
+        static Attendance TakeAttendanceUI(StudentEnrollmentService studentEnrollmentService)
+        {
+            Console.WriteLine("All StudentEnrollment:");
+            List<StudentEnrollmentView> studentEnrollmentView = studentEnrollmentService.GetStudentEnrollmentView();
+            ShowAllStudentEnrollment(studentEnrollmentView);
+            Console.WriteLine();
+
+
+            Console.WriteLine("Enter StudentEnrollmentId, AttendanceDate and Status for Create Attendance:");
+            Console.Write("StudentEnrollmentId: ");
+            int studentEnrollmentId = int.Parse(Console.ReadLine());
+            Console.Write("AttendanceDate: ");
+            string attendanceDate = Console.ReadLine();
+            Console.Write("Status: ");
+            string status = Console.ReadLine();
+
+
+            Attendance attendance = new Attendance(studentEnrollmentId, attendanceDate, status);
+
+            Console.WriteLine("Create Attendance successfully.");
+
+            return attendance;
+
+        }
+
+        static void ShowAllAttendance(List<AttendanceView> attendanceView)
+        {
+
+            if (attendanceView.Count > 0)
+            {
+                foreach (AttendanceView attendance in attendanceView)
+                {
+                    Console.WriteLine($"AttendanceId: {attendance.AttendanceId},StudentId: {attendance.StudentID},StudentName: {attendance.Name}, CourseName: {attendance.CourseName}, AttendanceDate: {attendance.AttendanceDate}, Status: {attendance.Status}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No Attendance found.");
+            }
+        }
+
 
     }
 

@@ -1,4 +1,5 @@
-﻿using Domain.Classes;
+﻿using DAL.Models;
+using Domain.Classes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,11 @@ namespace BLL.Interfaces
     public interface ITeacherService
     {
         void ManageCourses();
-        void UpdateAttendance();
+        public void TakeAttendance(Attendance attendance);
         void GradeStudents();
         void SuperviseResearch();
-        void TakeExam();
+        public void TakeExam(Exam exam);
+        public void AssignedTeacher(AssignedTeacher assignedTeacher);
         public List<Teacher> GetAllTeachers();
         public Teacher GetTeacherById(int id);
         public void CreateTeacher(Teacher teacher);
